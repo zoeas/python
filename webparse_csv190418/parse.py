@@ -57,7 +57,8 @@ for tdic,ndic in zip(title_dic, num_dic):
     write_ws.cell(i, 2, ndic)
     i = i + 3
 
-write_wb.save('test.xlsx')
+now = datetime.now()
+write_wb.save('%s-%s-%s 옥외광고협회 전화번호.xlsx' % (now.year, now.month, now.day))
 
 
 
