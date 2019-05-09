@@ -7,12 +7,12 @@ import re
 import time
 
 urllist = []
-urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=10&syear_option=2019&smonth_option=4&syear_option=&smonth_option=&common_code=30') # 중구
-urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=20&syear_option=2019&smonth_option=4&syear_option=&smonth_option=&common_code=30') # 동구
-urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=30&syear_option=2019&smonth_option=4&syear_option=&smonth_option=&common_code=30') # 서구
-urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=40&syear_option=2019&smonth_option=4&syear_option=&smonth_option=&common_code=30') # 남구
-urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=50&syear_option=2019&smonth_option=4&syear_option=&smonth_option=&common_code=30') # 북구
-urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=60&syear_option=2019&smonth_option=4&syear_option=&smonth_option=&common_code=30') # 수성구
+urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=10&common_code=30') # 중구
+urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=20&common_code=30') # 동구
+urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=30&common_code=30') # 서구
+urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=40&common_code=30') # 남구
+urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=50&common_code=30') # 북구
+urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=60&common_code=30') # 수성구
 
 write_wb = Workbook()
 
@@ -48,13 +48,22 @@ for tag_td in tags_td:
             title_list.append(m.group(1).replace(' ',''))
             num_list.append(m.group(2))
 
-title_dic = list(OrderedDict.fromkeys(title_list))
-num_dic = list(OrderedDict.fromkeys(num_list))
+# 업체랑 전화번호 저장 (중복제거)
+temp_set = set()
+rtitle_list = []
+rnum_list = []
+
+# 임시집합에 업체명을 저장하면서 리스트 비교, 중복 존재시 패스
+for t,n in zip(title_list, num_list):
+    if t not in temp_set:
+        rtitle_list.append(t)
+        rnum_list.append(n)
+        temp_set.add(t)
 
 i = 1
-for tdic,ndic in zip(title_dic, num_dic):
-    write_ws.cell(i, 1, tdic)
-    write_ws.cell(i, 2, ndic)
+for t, n in zip(rtitle_list, rnum_list):   # 1열에 업체명, 2열에 전화번호, 빈행 2개 삽입후 다음 기록 계속
+    write_ws.cell(i, 1, t)
+    write_ws.cell(i, 2, n)
     i = i + 3
 
 now = datetime.now()
