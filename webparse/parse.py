@@ -1,6 +1,7 @@
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
+from openpyxl import load_workbook
 from collections import OrderedDict
 from datetime import datetime
 import re
@@ -13,6 +14,16 @@ urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=30&common_code=3
 urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=40&common_code=30') # 남구
 urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=50&common_code=30') # 북구
 urllist.append('http://www.dgkoaa.or.kr/sub01-08.jsp?common_sel=60&common_code=30') # 수성구
+
+# 미리 제거할 업체명
+# rmlist = ["미미사","제형면옥(범어점)","(주)애드씨케이(대구혁신도시하우스디어반)","한애드","아시아애드바룬광고사"]
+
+load_wb = load_workbook("제외리스트.xlsx", data_only=True)
+load_ws = load_wb['Sheet1']
+
+rmlist = []
+for i in load_ws.rows:
+    rmlist.append(i[0].value)
 
 write_wb = Workbook()
 
@@ -48,17 +59,17 @@ for tag_td in tags_td:
             title_list.append(m.group(1).replace(' ',''))
             num_list.append(m.group(2))
 
-# 업체랑 전화번호 저장 (중복제거)
-temp_set = set()
+# 중복제거용 집합셋 + 미리제거할 목록
+remove_set = set(rmlist)
 rtitle_list = []
 rnum_list = []
 
 # 임시집합에 업체명을 저장하면서 리스트 비교, 중복 존재시 패스
 for t,n in zip(title_list, num_list):
-    if t not in temp_set:
+    if t not in remove_set:
         rtitle_list.append(t)
         rnum_list.append(n)
-        temp_set.add(t)
+        remove_set.add(t)
 
 i = 1
 for t, n in zip(rtitle_list, rnum_list):   # 1열에 업체명, 2열에 전화번호, 빈행 2개 삽입후 다음 기록 계속
